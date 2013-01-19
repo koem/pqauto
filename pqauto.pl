@@ -226,6 +226,7 @@ sub gcquery {
     $agent->field('ctl00$ContentBody$LatLong$_inputLongMins', $kos[5]);
     $agent->field('ctl00$ContentBody$tbResults', '1000');
 
+    # unused option - maybe they don't need to be here ...
     $agent->field('ctl00$ContentBody$DateTimeBegin$Day', '4');
     $agent->field('ctl00$ContentBody$DateTimeEnd$Year', '2013');
     $agent->field('ctl00$ContentBody$ddDifficultyScore', '1');
