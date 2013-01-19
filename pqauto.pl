@@ -86,14 +86,6 @@ sub getgpxs {
     my $radius = shift; # as km
     my $safety = shift; # safety rim for radius
 
-    #
-    # strategy:
-    # - walk from west to east, north to south to make several queries
-    # - as the longitudes get narrower in direction to the poles, 
-    #   determine the distance to the next center point for a query
-    #   using the latitude nearer to the equator
-    #
-
     my $w = int(&distance($north, $west, $north, $east));
     my $h = int(&distance($north, $west, $south, $west));
 
@@ -104,6 +96,14 @@ sub getgpxs {
     $gcdrawlink .= "p" . $south . "," . $west . ":90:" . $w . "km:white&";
     $gcdrawlink .= "p" . $south . "," . $east . ":270:" . $w . "km:white&";
     
+    #
+    # strategy:
+    # - walk from west to east, north to south to make several queries
+    # - as the longitudes get narrower in direction to the poles, 
+    #   determine the distance to the next center point for a query
+    #   using the latitude nearer to the equator
+    #
+
     # determine latitude difference. this doesn't change, lats are
     # always spaced equally
 
@@ -226,7 +226,7 @@ sub gcquery {
     $agent->field('ctl00$ContentBody$LatLong$_inputLongMins', $kos[5]);
     $agent->field('ctl00$ContentBody$tbResults', '1000');
 
-    # unused option - maybe they don't need to be here ...
+    # unused options - maybe they don't need to be here ...
     $agent->field('ctl00$ContentBody$DateTimeBegin$Day', '4');
     $agent->field('ctl00$ContentBody$DateTimeEnd$Year', '2013');
     $agent->field('ctl00$ContentBody$ddDifficultyScore', '1');
