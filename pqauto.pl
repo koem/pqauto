@@ -17,10 +17,6 @@
 # (projections, radiuses, ...). Search for "gcdrawlink" in this
 # script to find the link.
 #
-#
-# TODO:
-#  * calculate starting radius from boundaries
-#  * include query name in download file name
 
 use warnings;
 use strict;

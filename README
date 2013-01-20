@@ -7,3 +7,9 @@ Two big drawbacks:
 a) you can only use this tool, when you are a premium member on geocaching.com as PQs are only available for premium members
 
 b) pqauto saves the PQs on http://geocaching.com/pocket/ - you then have to activate them for running. But: geocaching.com limits you in the number of PQs you can run in a 24h period. Maximum is 5. So don't try to generate PQs for the whole world or a too big area.  You will never be able to run them all.
+
+
+to do:
+ * calculate starting radius from boundaries
+ * include query name in download file name
+ * all options as command line arguments
