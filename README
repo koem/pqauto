@@ -1,13 +1,13 @@
 pqauto will automatically surf geocaching.com to generate multiple pocket queries to cover any given area completely. 
 
-PQs can return a maximum of 1000 caches. When a PQ returns less then 1000 caches, then it is saved on geocaching.com. When it returns 1000 caches, pqauto will dig deeper and generate multiple PQs for that area. When then there are PQs which return 1000 caches again ... and so on.
+PQs can return a maximum of 1000 caches. When a PQ returns less then 1000 caches, then it is saved on geocaching.com. When it returns 1000 caches, pqauto will dig deeper and generate multiple PQs for that area. When then there are PQs which return 1000 caches again, pqauto will dig deeper ... and so on.
 
-Two big drawbacks:
+The Two Big Drawbacks:
 
-a) you can only use this tool, when you are a premium member on geocaching.com as PQs are only available for premium members
+a) You can only use this tool, when you are a premium member on geocaching.com as PQs are only available for premium members.
 
-b) pqauto saves the PQs on http://geocaching.com/pocket/ - you then have to activate them for running. But: geocaching.com limits you in the number of PQs you can run in a 24h period. Maximum is 5. So don't try to generate PQs for the whole world or a too big area.  You will never be able to run them all.
+b) pqauto saves the PQs on http://geocaching.com/pocket/ - you then have to activate them for running. But: geocaching.com limits you in the number of PQs you can run in a 24h period. Maximum is 5. So don't try to generate PQs for the whole world or a too big area. You will never be able to run them all.
 
 
 to do:
- * include query name in download file name
+ * nothing right now ...

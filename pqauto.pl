@@ -62,7 +62,7 @@ my $daytogenerate = 6; # 0=sun, 6=sat
 &checkarguments;
 &login;
 my $startradius = &getstartradius;
-&getgpxs($bnorth, $bwest, $bsouth, $beast, $startradius);
+&createqueries($bnorth, $bwest, $bsouth, $beast, $startradius);
 
 print $gcdrawlink . "\n";
 
@@ -91,6 +91,8 @@ sub getstartradius {
     } elsif ($km > $maxradiussqr) {
         $km = $maxradiussqr;
     }
+    print "Starting with radius $km km\n";
+    return $km
 }
 
 sub login {
@@ -120,7 +122,7 @@ sub thicker {
     }
 }
 
-sub getgpxs {
+sub createqueries {
     my $north = shift; # as decimal degrees
     my $west = shift;
     my $south = shift;
@@ -151,6 +153,7 @@ sub getgpxs {
     # divide by sqrt(2) - only use the rectangle that fits into the circle
     # subtract 1 for safety
     my $latdiff = rad2deg(($radius - 1) / sqrt(2) / $erad);
+print "latdiff: $latdiff\n";
 
     for (my $lat = $north; $lat > $south; $lat -= 2 * $latdiff) {
         # determine longitude difference by walking to the east
@@ -160,6 +163,7 @@ sub getgpxs {
         my $latsouth = $lat - 2 * $latdiff;
         my $latmax = &thicker($lat, $latsouth);
         my $londiff = &km2lon(($radius - 1) / sqrt(2), $latmax);
+print "londiff: $londiff\n";
 
         for (my $lon = $west; $lon < $east; $lon += 2 * $londiff) {
             my $ctrlat = $lat - $latdiff;
@@ -178,7 +182,8 @@ sub getgpxs {
                 # recursion?
 
                 if ($radius == 1) { 
-                    # we cant get all caches in this point!
+                    # we can't get all caches in this point!
+                    # (cannot really happen, just for precaution)
                     # lets take what we have ...
                     print "Too much caches in this area. ";
                     $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:black&", $ctrlat, $ctrlon, $radius);
@@ -190,13 +195,21 @@ sub getgpxs {
 
                 print "Going nearer and ";
                 &deletequery;
-                &getgpxs($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, ceil($radius / 2));
+                &createqueries($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, ceil($radius / 2));
             } elsif ($1 > 0) {
                 $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
                 &savequery;
             } else {
                 &deletequery;
             }
+
+            if ($londiff == 0) { # this will happen, when radius is 1 km
+                last;
+            }
+        }
+        
+        if ($latdiff == 0) { # this will happen, when radius is 1 km 
+            last;
         }
     }
 
@@ -256,6 +269,7 @@ sub gcquery {
     $agent->field('ctl00$ContentBody$LatLong$_inputLongDegs', $kos[4]);
     $agent->field('ctl00$ContentBody$LatLong$_inputLongMins', $kos[5]);
     $agent->field('ctl00$ContentBody$tbResults', '1000');
+    $agent->tick('ctl00$ContentBody$cbIncludePQNameInFileName', 'on');
 
     # unused options - maybe they don't need to be here ...
     $agent->field('ctl00$ContentBody$DateTimeBegin$Day', '4');
