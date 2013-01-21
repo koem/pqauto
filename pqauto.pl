@@ -153,7 +153,6 @@ sub createqueries {
     # divide by sqrt(2) - only use the rectangle that fits into the circle
     # subtract 1 for safety
     my $latdiff = rad2deg(($radius - 1) / sqrt(2) / $erad);
-print "latdiff: $latdiff\n";
 
     for (my $lat = $north; $lat > $south; $lat -= 2 * $latdiff) {
         # determine longitude difference by walking to the east
@@ -163,7 +162,6 @@ print "latdiff: $latdiff\n";
         my $latsouth = $lat - 2 * $latdiff;
         my $latmax = &thicker($lat, $latsouth);
         my $londiff = &km2lon(($radius - 1) / sqrt(2), $latmax);
-print "londiff: $londiff\n";
 
         for (my $lon = $west; $lon < $east; $lon += 2 * $londiff) {
             my $ctrlat = $lat - $latdiff;
