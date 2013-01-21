@@ -7,56 +7,91 @@
 # After running the script, you have to activate the queries on
 # http://www.geocaching.com/pocket/
 #
-# Edit the section below, where you can define boundaries and
-# stuff.
-#
 # The script will print out a link which you can use to see what
 # queries were made. As a web link is restricted to 2048
-# characters, it might be possible, that some queries will not
-# be shown on the map. You can use the tool for your own GC-needs
-# (projections, radiuses, ...). Search for "gcdrawlink" in this
+# characters, it might be, that some queries will not be shown 
+# on the map. You can use the tool for your own GC-needs 
+# (projections, radiuses, ...). Search for "gcdrawlink" in this 
 # script to find the link.
 #
 
 use warnings;
 use strict;
 
+use POSIX;
 use WWW::Mechanize;
 use WWW::Mechanize::Image;
 use Crypt::SSLeay;
 use List::Util qw[min max];
 use Math::Trig;
 
-##############################################################
-# change these values to your needs:
+# get arguments from command line
 
 # login
-my $username = "";
-my $password = "";
+my $username = shift;
+my $password = shift;
 
 # boundaries
-my $bnorth = -34.2;
-my $bwest = 166;
-my $bsouth = -47.4;
-my $beast = 178.6;
+my $bnorth = shift;
+my $bwest = shift;
+my $bsouth = shift;
+my $beast = shift;
 
 # queries
-my $querynameprefix = "nz1-";
+my $querynameprefix = shift;
 
-##############################################################
+# check if all arguments are there
+if (! defined $querynameprefix) {
+    print "Usage: pqauto.pl <username> <password> <north> <west> <south> <east> <prefix>\n";
+    print "  <username>   your geocaching.com user name\n";
+    print "  <password>   your geocaching.com password\n";
+    print "  <north> ...  boundaries for query\n";
+    print "  <prefix>     prefix for query names\n";
+    exit;
+}
 
 my $erad = 6371; # for km
+my $maxradiussqr = int(750.0 / sqrt(2));
+
 my $agent = WWW::Mechanize->new( autocheck => 1 );
 my $gcdrawlink = "http://koemski.tipido.net/gc/gcdraw.html?";
 my $gpxcount = 0;
 my $daytogenerate = 6; # 0=sun, 6=sat
 
+
+&checkarguments;
 &login;
-&getgpxs($bnorth, $bwest, $bsouth, $beast, 128, 8);
+my $startradius = &getstartradius;
+&getgpxs($bnorth, $bwest, $bsouth, $beast, $startradius);
 
 print $gcdrawlink . "\n";
 
 exit;
+
+sub checkarguments {
+    if ($bnorth <= $bsouth) {
+        print "Boundaries Error: north must be higher than south.\n";
+        exit
+    }
+    if ($beast <= $bwest) {
+        print "Boundaries Error: east must be higher than west.\n";
+        exit;
+    }
+}
+
+sub getstartradius {
+    my $lonkm = ceil(&distance($bnorth, $bwest, $bsouth, $bwest));
+    my $maxlat = &thicker($bnorth, $bsouth);
+    my $latkm = ceil(&distance($maxlat, $bwest, $maxlat, $beast));
+
+    my $km = min($lonkm, $latkm);
+
+    if ($km < 1) {
+        $km = 1;
+    } elsif ($km > $maxradiussqr) {
+        $km = $maxradiussqr;
+    }
+}
 
 sub login {
     print "logging in ...\n";
@@ -74,13 +109,23 @@ sub login {
     # print $r->decoded_content;
 }
 
+sub thicker {
+    my $n = shift;
+    my $s = shift;
+    if ($n > 0 && $s < 0) {
+        return 0; # equator when north is above and south below
+    } else {
+        # nearest one to equator. sign (=hemisphere) does not matter for calculation
+        return min(abs($n), abs($s)); 
+    }
+}
+
 sub getgpxs {
     my $north = shift; # as decimal degrees
     my $west = shift;
     my $south = shift;
     my $east = shift;
     my $radius = shift; # as km
-    my $safety = shift; # safety rim for radius
 
     my $w = int(&distance($north, $west, $north, $east));
     my $h = int(&distance($north, $west, $south, $west));
@@ -104,28 +149,23 @@ sub getgpxs {
     # always spaced equally
 
     # divide by sqrt(2) - only use the rectangle that fits into the circle
-    my $latdiff = rad2deg(($radius - $safety) / sqrt(2) / $erad);
+    # subtract 1 for safety
+    my $latdiff = rad2deg(($radius - 1) / sqrt(2) / $erad);
 
     for (my $lat = $north; $lat > $south; $lat -= 2 * $latdiff) {
         # determine longitude difference by walking to the east
         # on the latitude which is nearest to the equator (latmax)
         # because there the earth is thicker and the spacing of the
         # longitudes is wider
-        my $latmax;
         my $latsouth = $lat - 2 * $latdiff;
-        if ($lat > 0 && $latsouth < 0) {
-            $latmax = 0; # equator when north is above and south below
-        } else {
-            # nearest one to equator. sign (=hemisphere) does not matter for calculation
-            $latmax = min(abs($lat), abs($latsouth)); 
-        }
-        my $londiff = &km2lon(($radius - $safety) / sqrt(2), $latmax);
+        my $latmax = &thicker($lat, $latsouth);
+        my $londiff = &km2lon(($radius - 1) / sqrt(2), $latmax);
 
         for (my $lon = $west; $lon < $east; $lon += 2 * $londiff) {
             my $ctrlat = $lat - $latdiff;
             my $ctrlon = $lon + $londiff;
 
-            print "query ", $ctrlat, ",", $ctrlon, " radius ", $radius, ": ";
+            printf "query %0.6f,%0.6f radius %d: ", $ctrlat, $ctrlon, $radius;
             my $qryres = &gcquery($ctrlat, $ctrlon, $radius, 0);
             $qryres =~ /results in (.*) caches/;
             if (!defined($1)) {
@@ -137,8 +177,7 @@ sub getgpxs {
             if ($1 >= 1000) {
                 # recursion?
 
-                my $newradius = $radius / 2;
-                if ($newradius < 1) { 
+                if ($radius == 1) { 
                     # we cant get all caches in this point!
                     # lets take what we have ...
                     print "Too much caches in this area. ";
@@ -149,13 +188,9 @@ sub getgpxs {
 
                 # recursion
 
-                my $newsafety = $safety / 2;
-                if ($newsafety < 1) { $newsafety = 1; }
-
                 print "Going nearer and ";
                 &deletequery;
-                &getgpxs($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, 
-                        $newradius, $newsafety);
+                &getgpxs($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, ceil($radius / 2));
             } elsif ($1 > 0) {
                 $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
                 &savequery;

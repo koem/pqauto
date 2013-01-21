@@ -10,6 +10,4 @@ b) pqauto saves the PQs on http://geocaching.com/pocket/ - you then have to acti
 
 
 to do:
- * calculate starting radius from boundaries
  * include query name in download file name
- * all options as command line arguments
