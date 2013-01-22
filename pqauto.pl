@@ -45,7 +45,7 @@ if (! defined $querynameprefix) {
     print "Usage: pqauto.pl <username> <password> <north> <west> <south> <east> <prefix>\n";
     print "  <username>   your geocaching.com user name\n";
     print "  <password>   your geocaching.com password\n";
-    print "  <north> ...  boundaries for query\n";
+    print "  <north> ...  boundaries for the area in decimal format (e.g. -5.1721)\n";
     print "  <prefix>     prefix for query names\n";
     exit;
 }
