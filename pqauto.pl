@@ -7,13 +7,6 @@
 # After running the script, you have to activate the queries on
 # http://www.geocaching.com/pocket/
 #
-# The script will print out a link which you can use to see what
-# queries were made. As a web link is restricted to 2048
-# characters, it might be, that some queries will not be shown 
-# on the map. You can use the tool for your own GC-needs 
-# (projections, radiuses, ...). Search for "gcdrawlink" in this 
-# script to find the link.
-#
 
 use warnings;
 use strict;
@@ -101,7 +94,7 @@ sub getstartradius {
 sub login {
     print "logging in ...\n";
 
-    my $r = $agent->get('https://www.geocaching.com/login/default.aspx');
+    my $r = $agent->get('http://www.geocaching.com/login/default.aspx');
 
     # print $r->decoded_content;
 
@@ -187,7 +180,7 @@ sub createqueries {
                     # (cannot really happen, just for precaution)
                     # lets take what we have ...
                     print "Too much caches in this area. ";
-                    $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:black&", $ctrlat, $ctrlon, $radius);
+                    $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
                     &savequery;
                     next;
                 }
@@ -195,14 +188,14 @@ sub createqueries {
                 # recursion
 
                 print "Going nearer and ";
-                $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
+                # $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
                 &deletequery;
                 &createqueries($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, ceil($radius / 2));
             } elsif ($1 > 0) {
                 $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
                 &savequery;
             } else {
-                $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
+                # $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
                 &deletequery;
             }
 
