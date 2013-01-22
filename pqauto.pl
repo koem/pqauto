@@ -51,7 +51,7 @@ if (! defined $querynameprefix) {
 }
 
 my $erad = 6371; # for km
-my $maxradiussqr = int(750.0 / sqrt(2));
+my $maxradiussqr = floor(750.0 / sqrt(2));
 
 my $agent = WWW::Mechanize->new( autocheck => 1 );
 my $gcdrawlink = "http://koemski.tipido.net/gc/gcdraw.html?";
@@ -88,9 +88,12 @@ sub getstartradius {
 
     if ($km < 1) {
         $km = 1;
-    } elsif ($km > $maxradiussqr) {
-        $km = $maxradiussqr;
     }
+    
+    while ($km > $maxradiussqr) {
+        $km = floor($km / 2) + 1;
+    }
+
     print "Starting with radius $km km\n";
     return $km
 }
@@ -129,8 +132,8 @@ sub createqueries {
     my $east = shift;
     my $radius = shift; # as km
 
-    my $w = int(&distance($north, $west, $north, $east));
-    my $h = int(&distance($north, $west, $south, $west));
+    my $w = floor(&distance($north, $west, $north, $east));
+    my $h = floor(&distance($north, $west, $south, $west));
 
     $gcdrawlink .= "p" . $north . "," . $west . ":90:" . $w . "km:white&";
     $gcdrawlink .= "p" . $north . "," . $east . ":270:" . $w . "km:white&";
@@ -305,8 +308,8 @@ sub getquerykos {
     my $ew = 1;
     if ($lon < 0) { $ew = -1; }
 
-    my $latgrad = int(abs($lat));
-    my $longrad = int(abs($lon));
+    my $latgrad = floor(abs($lat));
+    my $longrad = floor(abs($lon));
 
     my $latmins = sprintf("%0.3f", (abs($lat) - $latgrad) * 60);
     my $lonmins = sprintf("%0.3f", (abs($lon) - $longrad) * 60);
