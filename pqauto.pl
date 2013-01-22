@@ -60,8 +60,8 @@ my $daytogenerate = 6; # 0=sun, 6=sat
 
 
 &checkarguments;
-&login;
 my $startradius = &getstartradius;
+&login;
 &createqueries($bnorth, $bwest, $bsouth, $beast, $startradius);
 
 print $gcdrawlink . "\n";
@@ -80,11 +80,11 @@ sub checkarguments {
 }
 
 sub getstartradius {
-    my $lonkm = ceil(&distance($bnorth, $bwest, $bsouth, $bwest));
+    my $lonkm = &distance($bnorth, $bwest, $bsouth, $bwest) / 2;
     my $maxlat = &thicker($bnorth, $bsouth);
-    my $latkm = ceil(&distance($maxlat, $bwest, $maxlat, $beast));
+    my $latkm = &distance($maxlat, $bwest, $maxlat, $beast) / 2;
 
-    my $km = min($lonkm, $latkm);
+    my $km = ceil(min($lonkm, $latkm) * sqrt(2)) + 1;
 
     if ($km < 1) {
         $km = 1;
@@ -170,7 +170,7 @@ sub createqueries {
             my $ctrlat = $lat - $latdiff;
             my $ctrlon = $lon + $londiff;
 
-            printf "query %0.6f,%0.6f radius %d: ", $ctrlat, $ctrlon, $radius;
+            printf "query center: %0.6f,%0.6f | radius: %d km | ", $ctrlat, $ctrlon, $radius;
             my $qryres = &gcquery($ctrlat, $ctrlon, $radius, 0);
             $qryres =~ /results in (.*) caches/;
             if (!defined($1)) {
@@ -195,12 +195,14 @@ sub createqueries {
                 # recursion
 
                 print "Going nearer and ";
+                $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
                 &deletequery;
                 &createqueries($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, ceil($radius / 2));
             } elsif ($1 > 0) {
                 $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
                 &savequery;
             } else {
+                $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
                 &deletequery;
             }
 
