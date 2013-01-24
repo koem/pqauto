@@ -181,7 +181,7 @@ sub createqueries {
                     # lets take what we have ...
                     print "Too much caches in this area. ";
                     $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
-                    &savequery;
+                    &savequery($1);
                     next;
                 }
 
@@ -193,7 +193,7 @@ sub createqueries {
                 &createqueries($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, ceil($radius / 2));
             } elsif ($1 > 0) {
                 $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
-                &savequery;
+                &savequery($1);
             } else {
                 # $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
                 &deletequery;
@@ -233,8 +233,9 @@ sub deletequery {
 }
 
 sub savequery {
+    my $nrcaches = shift;
     $gpxcount += 1;
-    my $qname = $querynameprefix . sprintf("%04d", $gpxcount);
+    my $qname = sprintf("%s%04d-%dcaches", $querynameprefix, $gpxcount, $nrcaches);
     print "Saving query ", $qname, "\n";
     $agent->field('ctl00$ContentBody$tbName', $qname);
     # $agent->tick('ctl00$ContentBody$cbDays$'.$daytogenerate, 'on');
@@ -254,7 +255,7 @@ sub gcquery {
 
     $agent->form_name('aspnetForm');
 
-    $agent->field('ctl00$ContentBody$tbName', 'testq');
+    $agent->field('ctl00$ContentBody$tbName', 'testquery');
     $agent->field('ctl00$ContentBody$LatLong', '1');
     $agent->field('ctl00$ContentBody$tbRadius', $radius);
     $agent->field('ctl00$ContentBody$rbUnitType', 'km');
