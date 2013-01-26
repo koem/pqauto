@@ -6,13 +6,13 @@ The names of the saved queries will include the prefix given on the command line
 
 pqauto will print out a link which you can use to see what queries were made. As a web link is restricted to 2048 characters, it might be, that some queries will not be shown on the map. You can use the tool for your own GC-needs (projections, radiuses, ...). Search for "gcdrawlink" in pqauto.pl to find the tool link.
 
+If Groundspeak kicks you out or makes any problems because of using this tool: I didn't run it, you did :)
+
 The Two Big Drawbacks:
 
 a) You can only use this tool, if you are a premium member on geocaching.com as PQs are only available for premium members.
 
 b) pqauto saves the PQs on http://geocaching.com/pocket/ - you then have to activate them for running. But: geocaching.com limits you in the number of PQs you can run in a 24h period. Maximum is 5. So don't try to generate PQs for the whole world or a too big area. You will never be able to run them all.
-
-If Groundspeak kicks you out or makes any problems because of using this tool: I didn't run it, you did.
 
 
 HOW TO RUN IT ...
@@ -24,6 +24,11 @@ _________________
  * download pqauto.pl from https://raw.github.com/koem/pqauto/master/pqauto.pl
  * download https://raw.github.com/koem/pqauto/master/GoogleReverseV3.pm
  * open a terminal window - Start -> Run -> enter "cmd" and hit Enter
+ * do this in the terminal window:
+   * cpan
+   * get Text::Unidecode
+   * install Text::Unidecode
+   * quit
  * navigate to the directory where pqauto.pl is - use "cd" commands
  * enter "perl pqauto.pl" and hit Enter to get an explanation about how to use the tool
 
@@ -33,8 +38,8 @@ If you are getting the message "Error GETing https://www...." then you are on yo
 
  * install perl
  * run "perl pqauto.pl" in a terminal window
- * install the libs that seem to be missing
-
+ * install the libs that seem to be missing (e.g. libtext-unidecode-perl) until pqauto runs without errors
+ 
 
 IF YOU HAVE IDEAS OR FIND ERRORS
 ________________________________
