@@ -2,7 +2,7 @@ pqauto will automatically surf geocaching.com to generate multiple pocket querie
 
 PQs can return a maximum of 1000 caches. When a PQ returns less then 1000 caches, then it is saved on geocaching.com. When it returns 1000 caches, pqauto will dig deeper and generate multiple PQs for that area. When then there are PQs which return 1000 caches again, pqauto will dig deeper ... and so on.
 
-The names of the saved queries will include the prefix given on the command line, the city name retrieved via Google Maps API and the number of caches.
+The names of the saved queries will include the prefix given on the command line, the city name in the center of the query retrieved via Google Maps API and the number of caches.
 
 pqauto will print out a link which you can use to see what queries were made. As a web link is restricted to 2048 characters, it might be, that some queries will not be shown on the map. You can use the tool for your own GC-needs (projections, radiuses, ...). Search for "gcdrawlink" in pqauto.pl to find the tool link.
 
