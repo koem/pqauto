@@ -2,7 +2,9 @@ pqauto will automatically surf geocaching.com to generate multiple pocket querie
 
 PQs can return a maximum of 1000 caches. When a PQ returns less then 1000 caches, then it is saved on geocaching.com. When it returns 1000 caches, pqauto will dig deeper and generate multiple PQs for that area. When then there are PQs which return 1000 caches again, pqauto will dig deeper ... and so on.
 
-pqauto will print out a link which you can use to see what queries were made. As a web link is restricted to 2048 characters, it might be, that some queries will not be shown on the map. You can use the tool for your own GC-needs (projections, radiuses, ...). Search for "gcdrawlink" in pqauto.pl to find the link.
+The names of the saved queries will include the prefix given on the command line, the city name retrieved via Google Maps API and the number of caches.
+
+pqauto will print out a link which you can use to see what queries were made. As a web link is restricted to 2048 characters, it might be, that some queries will not be shown on the map. You can use the tool for your own GC-needs (projections, radiuses, ...). Search for "gcdrawlink" in pqauto.pl to find the tool link.
 
 The Two Big Drawbacks:
 
@@ -16,19 +18,20 @@ _________________
 
 ... ON WINDOWS
 
-1. download perl from http://www.perl.org/get.html and install - e.g. DWIM Perl works.
-2. download pqauto.pl from https://raw.github.com/koem/pqauto/master/pqauto.pl
-3. open a terminal window - Start -> Run -> enter "cmd" and hit Enter
-4. navigate to the directory where pqauto.pl is - use "cd" commands
-5. enter "perl pqauto.pl" and hit Enter to get an explanation about how to use the tool
+ * download perl from http://www.perl.org/get.html and install - e.g. DWIM Perl works.
+ * download pqauto.pl from https://raw.github.com/koem/pqauto/master/pqauto.pl
+ * download https://raw.github.com/koem/pqauto/master/GoogleReverseV3.pm
+ * open a terminal window - Start -> Run -> enter "cmd" and hit Enter
+ * navigate to the directory where pqauto.pl is - use "cd" commands
+ * enter "perl pqauto.pl" and hit Enter to get an explanation about how to use the tool
 
 If you are getting the message "Error GETing https://www...." then you are on your own. As said: DWIM Perl works - for me.
 
 ... ON LINUX
 
-1. install perl
-2. run "perl pqauto.pl" in a terminal window
-3. install the libs that seem to be missing
+ * install perl
+ * run "perl pqauto.pl" in a terminal window
+ * install the libs that seem to be missing
 
 
 IF YOU HAVE IDEAS OR FIND ERRORS

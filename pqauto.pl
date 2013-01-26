@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 # This perl script tries to store multiple pocket queries that
 # get all caches in a defined region.
@@ -16,7 +16,10 @@ use WWW::Mechanize;
 use WWW::Mechanize::Image;
 use Crypt::SSLeay;
 use List::Util qw[min max];
-use Math::Trig;
+use GoogleReverseV3;
+use Math::Trig qw[deg2rad rad2deg];
+use utf8;
+use Text::Unidecode;
 
 # get arguments from command line
 
@@ -50,7 +53,6 @@ my $agent = WWW::Mechanize->new( autocheck => 1 );
 my $gcdrawlink = "http://koemski.tipido.net/gc/gcdraw.html?";
 my $gpxcount = 0;
 my $daytogenerate = 6; # 0=sun, 6=sat
-
 
 &checkarguments;
 my $startradius = &getstartradius;
@@ -181,7 +183,7 @@ sub createqueries {
                     # lets take what we have ...
                     print "Too much caches in this area. ";
                     $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
-                    &savequery($1);
+                    &savequery($1, $ctrlat, $ctrlon);
                     next;
                 }
 
@@ -193,7 +195,7 @@ sub createqueries {
                 &createqueries($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, ceil($radius / 2));
             } elsif ($1 > 0) {
                 $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:red&", $ctrlat, $ctrlon, $radius);
-                &savequery($1);
+                &savequery($1, $ctrlat, $ctrlon);
             } else {
                 # $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
                 &deletequery;
@@ -234,8 +236,41 @@ sub deletequery {
 
 sub savequery {
     my $nrcaches = shift;
+    my $lat = shift;
+    my $lon = shift;
+
     $gpxcount += 1;
-    my $qname = sprintf("%s%04d-%dcaches", $querynameprefix, $gpxcount, $nrcaches);
+    
+    # get city name
+
+    my $geocoder = GoogleReverseV3->new();
+    my ($sublocality, $locality);
+    my $location = $geocoder->reverseGeocode(location => sprintf("%0.6f,%0.6f", $lat, $lon));
+
+    foreach (@{$location->{address_components}}) {
+        if (grep /^locality$/, @{$_->{types}}) {
+            $locality = $_->{short_name};
+        } elsif (grep /^sublocality$/, @{$_->{types}}) {
+            $sublocality = $_->{short_name};
+        }
+    }
+
+    my $city;
+    if (defined $locality and defined $sublocality) {
+        $city = "$locality, $sublocality";
+    } elsif (defined $locality) {
+        $city = $locality;
+    } elsif (defined $sublocality) {
+        $city = $sublocality;
+    }
+    if (defined $city) {
+        $city = unidecode("$city");
+    } else {
+        $city = "unknown city";
+    }
+
+    my $qname = sprintf("%s%04d - %s - %d caches", $querynameprefix, $gpxcount, $city, $nrcaches);
+
     print "Saving query ", $qname, "\n";
     $agent->field('ctl00$ContentBody$tbName', $qname);
     # $agent->tick('ctl00$ContentBody$cbDays$'.$daytogenerate, 'on');
