@@ -59,7 +59,8 @@ my $startradius = &getstartradius;
 &login;
 &createqueries($bnorth, $bwest, $bsouth, $beast, $startradius);
 
-print $gcdrawlink . "\n";
+print "see the query areas here: " . $gcdrawlink . "\n";
+print "activate your queries now on https://www.geocaching.com/pocket/";
 
 exit;
 
@@ -148,7 +149,7 @@ sub createqueries {
     # determine latitude difference. this doesn't change, lats are
     # always spaced equally
 
-    # divide by sqrt(2) - only use the rectangle that fits into the circle
+    # divide by sqrt(2) to only use the rectangle that fits into the circle
     # subtract 1 for safety
     my $latdiff = rad2deg(($radius - 1) / sqrt(2) / $erad);
 
@@ -189,7 +190,7 @@ sub createqueries {
 
                 # recursion
 
-                print "Going nearer and ";
+                print "zooming in and ";
                 # $gcdrawlink .= sprintf("c%0.6f,%0.6f:%dkm:yellow&", $ctrlat, $ctrlon, $radius);
                 &deletequery;
                 &createqueries($lat, $lon, $lat - 2 * $latdiff, $lon + 2 * $londiff, ceil($radius / 2));
@@ -205,7 +206,7 @@ sub createqueries {
                 last;
             }
         }
-        
+
         if ($latdiff == 0) { # this will happen, when radius is 1 km 
             last;
         }
@@ -317,7 +318,7 @@ sub gcquery {
     $agent->field('ctl00$ContentBody$ddDifficulty', '>=');
     $agent->field('ctl00$ContentBody$DateTimeBegin$Year', '2013');
     $agent->field('ctl00$ContentBody$Type', 'rbTypeAny');
-    $agent->tick('ctl00$ContentBody$cbZip', 'on');
+    ## $agent->tick('ctl00$ContentBody$cbZip', 'on');
     $agent->field('ctl00$ContentBody$ddFormats', 'GPX');
     $agent->field('ctl00$ContentBody$DateTimeBegin$Month', '1');
     $agent->field('ctl00$ContentBody$DateTimeEnd$Day', '11');
