@@ -50,7 +50,7 @@ my $erad = 6371; # for km
 my $maxradiussqr = floor(750.0 / sqrt(2));
 
 my $agent = WWW::Mechanize->new( autocheck => 1 );
-my $gcdrawlink = "http://koemski.tipido.net/gc/gcdraw.html?";
+my $gcdrawlink = "http://petoria.de/tipido-backup/gc/gcdraw.html?";
 my $gpxcount = 0;
 my $daytogenerate = 6; # 0=sun, 6=sat
 
