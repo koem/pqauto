@@ -150,8 +150,8 @@ sub createqueries {
     # always spaced equally
 
     # divide by sqrt(2) to only use the rectangle that fits into the circle
-    # subtract 1 for safety
-    my $latdiff = rad2deg(($radius - 1) / sqrt(2) / $erad);
+    # ( $radius - 1 ) for safety
+    my $latdiff = rad2deg(($radius) / sqrt(2) / $erad);
 
     for (my $lat = $north; $lat > $south; $lat -= 2 * $latdiff) {
         # determine longitude difference by walking to the east
